@@ -1,86 +1,57 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
-const BlogPost = ({ title, content, date }) => (
-  <Card className="mb-6">
-    <CardHeader>
-      <CardTitle>{title}</CardTitle>
-      <p className="text-sm text-gray-500">{date}</p>
-    </CardHeader>
-    <CardContent>
-      <p>{content}</p>
-    </CardContent>
-  </Card>
-);
+const Index = () => {
+  const [task, setTask] = useState('');
+  const [tasks, setTasks] = useState([]);
 
-const BlogPage = () => {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "Exploring AI Ethics",
-      content: "As we delve deeper into the world of artificial intelligence, it's crucial to consider the ethical implications...",
-      date: "2023-06-15"
-    },
-    {
-      id: 2,
-      title: "The Future of Machine Learning",
-      content: "Machine learning is rapidly evolving, and its applications are becoming increasingly diverse...",
-      date: "2023-06-10"
+  const handleAddTask = () => {
+    if (task.trim()) {
+      setTasks([...tasks, task.trim()]);
+      setTask('');
     }
-  ]);
-
-  const [newPost, setNewPost] = useState({ title: '', content: '' });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewPost(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (newPost.title && newPost.content) {
-      setPosts(prev => [
-        { id: prev.length + 1, ...newPost, date: new Date().toISOString().split('T')[0] },
-        ...prev
-      ]);
-      setNewPost({ title: '', content: '' });
-    }
+  const handleRemoveTask = (index) => {
+    setTasks(tasks.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Anton Osika's Blog</h1>
-      
-      <form onSubmit={handleSubmit} className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Add New Post</h2>
-        <Input
-          type="text"
-          name="title"
-          value={newPost.title}
-          onChange={handleInputChange}
-          placeholder="Post Title"
-          className="mb-4"
-        />
-        <textarea
-          name="content"
-          value={newPost.content}
-          onChange={handleInputChange}
-          placeholder="Post Content"
-          className="w-full p-2 mb-4 border rounded"
-          rows="4"
-        />
-        <Button type="submit">Add Post</Button>
-      </form>
-
-      <div>
-        {posts.map(post => (
-          <BlogPost key={post.id} {...post} />
-        ))}
-      </div>
+    <div className="container mx-auto p-4">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Task Manager</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex space-x-2 mb-4">
+            <Input
+              type="text"
+              placeholder="Enter a task"
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
+            />
+            <Button onClick={handleAddTask}>Add</Button>
+          </div>
+          <ul className="space-y-2">
+            {tasks.map((t, index) => (
+              <li key={index} className="flex justify-between items-center bg-gray-100 p-2 rounded">
+                <span>{t}</span>
+                <Button variant="destructive" size="sm" onClick={() => handleRemoveTask(index)}>
+                  Remove
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+        <CardFooter className="justify-center">
+          <p className="text-sm text-gray-500">Total tasks: {tasks.length}</p>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
 
-export default BlogPage;
+export default Index;
